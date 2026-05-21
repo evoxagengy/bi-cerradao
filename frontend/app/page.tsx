@@ -24,13 +24,15 @@ export default function Home() {
 
   useEffect(() => {
 
-    const fetchDashboard = () => {
-
-      fetch("https://bi-cerradao.onrender.com/dashboard")
-        .then((res) => res.json())
-        .then((data) => {
-          setDashboard(data);
-        });
+  const fetchDashboard = () => {
+  
+    fetch("https://bi-cerradao.onrender.com/dashboard", {
+      cache: "no-store"
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setDashboard(data);
+      });
 
     };
 
