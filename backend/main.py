@@ -21,7 +21,7 @@ app.add_middleware(
 # EXCEL
 # ==========================================
 
-EXCEL_FILE = r"D:\0 - Sites\BI - Cartas Convites\backend\Controle Cartas Convites.xlsx"
+EXCEL_FILE = "Controle Cartas Convites.xlsx"
 
 
 # ==========================================
