@@ -227,7 +227,7 @@ export default function Home() {
             <div>
 
               <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#a3652a]">
-                Painel Executivo
+                Dashboard
               </p>
 
               <h1 className="mt-1 text-[30px] font-black leading-none tracking-tight text-[#004d33]">
