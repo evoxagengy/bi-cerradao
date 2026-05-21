@@ -15,7 +15,9 @@ export default function CartasConvitePage() {
 
   useEffect(() => {
 
-    fetch("https://bi-cerradao.onrender.com/cartas")
+    fetch("https://bi-cerradao.onrender.com/cartas", {
+    cache: "no-store"
+  })
       .then((res) => res.json())
       .then((data) => {
 
