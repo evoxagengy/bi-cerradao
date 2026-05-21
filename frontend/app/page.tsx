@@ -24,11 +24,25 @@ export default function Home() {
 
   useEffect(() => {
 
-    fetch("https://bi-cerradao.onrender.com/dashboard")
-      .then((res) => res.json())
-      .then((data) => {
-        setDashboard(data);
-      });
+    const fetchDashboard = () => {
+
+      fetch("https://bi-cerradao.onrender.com/dashboard")
+        .then((res) => res.json())
+        .then((data) => {
+          setDashboard(data);
+        });
+
+    };
+
+    fetchDashboard();
+
+    const interval = setInterval(() => {
+
+      fetchDashboard();
+
+    }, 30000);
+
+    return () => clearInterval(interval);
 
   }, []);
 
