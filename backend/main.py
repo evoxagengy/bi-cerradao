@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import numpy as np
+import requests
+from io import BytesIO
 
 app = FastAPI()
 
@@ -21,7 +23,7 @@ app.add_middleware(
 # EXCEL
 # ==========================================
 
-EXCEL_FILE = "Controle Cartas Convites.xlsx"
+EXCEL_URL = "https://uscerradao-my.sharepoint.com/personal/bruno_santos_cerradao_com_br/_layouts/15/download.aspx?share=IQDXgJvPq9rGRI7lp7JcfjQpAY1A_hzlLl9YkPWNPx87woo"
 
 
 # ==========================================
@@ -33,6 +35,22 @@ def clean_value(value):
         return ""
     return str(value).strip()
 
+def load_excel():
+
+    response = requests.get(
+        EXCEL_URL,
+        headers={
+            "Cache-Control": "no-cache"
+        }
+    )
+
+    excel_file = BytesIO(response.content)
+
+    df = pd.read_excel(excel_file)
+
+    df.columns = df.columns.str.strip()
+
+    return df
 
 # ==========================================
 # DASHBOARD
@@ -45,7 +63,16 @@ def dashboard():
     # LOAD EXCEL
     # ==========================================
 
-    df = pd.read_excel(EXCEL_FILE)
+    response = requests.get(
+        EXCEL_URL,
+        headers={
+            "Cache-Control": "no-cache"
+        }
+    )
+    
+    excel_file = BytesIO(response.content)
+    
+    df = load_excel()
 
     # ==========================================
     # NORMALIZAÇÃO
@@ -356,21 +383,30 @@ def dashboard():
     # ==========================================
     # CUSTO TOTAL
     # ==========================================
-
+    
     try:
-
+    
+        valores = (
+            df["VALOR"]
+            .astype(str)
+            .str.replace("R$", "", regex=False)
+            .str.replace(".", "", regex=False)
+            .str.replace(",", ".", regex=False)
+            .str.strip()
+        )
+    
         custo_total = pd.to_numeric(
-            df["VALOR"],
+            valores,
             errors="coerce"
         ).fillna(0).sum()
-
+    
         custo_total = round(
             float(custo_total),
             2
         )
-
+    
     except:
-
+    
         custo_total = 0
 
     # ==========================================
@@ -411,7 +447,7 @@ def dashboard():
 @app.get("/cartas")
 def cartas():
 
-    df = pd.read_excel(EXCEL_FILE)
+    df = load_excel()
 
     df.columns = df.columns.str.strip()
 
