@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import Link from "next/link";
 
 import {
@@ -13,7 +15,51 @@ import {
   Menu,
 } from "lucide-react";
 
+const API_URL = "https://bi-cerradao.onrender.com/milestones";
+
 export default function MilestonesPage() {
+
+      const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+
+    async function loadData() {
+
+      try {
+
+        const response = await fetch(API_URL);
+
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+
+          setRows(data);
+
+        } else {
+
+          console.error("Resposta inválida:", data);
+
+          setRows([]);
+
+        }
+
+      } catch (error) {
+
+        console.error(error);
+
+      } finally {
+
+        setLoading(false);
+
+      }
+    }
+
+    loadData();
+
+  }, []);
+
+  console.log(rows);
 
   return (
 
@@ -304,28 +350,44 @@ export default function MilestonesPage() {
 
             <Card
             title="ATIVIDADES TOTAIS"
-            value="124"
+            value={rows.length}
             subtitle="+12 novas esta semana"
             color="gray"
             />
 
             <Card
             title="CONCLUÍDAS"
-            value="84"
+            value={
+            rows.filter(
+                (r) =>
+                r.status?.toUpperCase() === "REALIZADO"
+            ).length
+            }
             subtitle="67,7% do total"
             color="green"
             />
 
             <Card
             title="EM ANDAMENTO"
-            value="32"
+            value={
+            rows.filter((r) =>
+                ["AGENDADO", "EM ANDAMENTO", "EM EXECUÇÃO"].includes(
+                r.status?.toUpperCase()
+                )
+            ).length
+            }
             subtitle="25,8% do total"
             color="orange"
             />
 
             <Card
             title="EM ATRASO"
-            value="8"
+            value={
+            rows.filter(
+                (r) =>
+                r.status?.toUpperCase() === "ATRASADO"
+            ).length
+            }
             subtitle="6,5% do total"
             color="red"
             />

@@ -563,9 +563,26 @@ def milestones():
 
     df = pd.read_excel(
         excel_file,
-        sheet_name="BASE_CURVA"
+        sheet_name="BASE_CURVA",
+        engine="openpyxl",
+        usecols=[
+            "ASSUNTO",
+            "TÓPICO",
+            "DETALHAMENTO DA AÇÃO",
+            "RESPONSÁVEL",
+            "MÊS",
+            "DATA DE INICIO",
+            "DATA DE FIM",
+            "TÉRMINO REAL",
+            "SEMANA",
+            "STATUS",
+            "AVANÇO",
+            "COD_UNIC",
+            "OBSERVAÇÃO"
+        ]
     )
 
+    df = df.fillna("").astype(str)
     # ==========================================
     # LIMPEZA
     # ==========================================
