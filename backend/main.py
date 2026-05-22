@@ -25,6 +25,7 @@ app.add_middleware(
 
 EXCEL_URL = "https://uscerradao-my.sharepoint.com/personal/bruno_santos_cerradao_com_br/_layouts/15/download.aspx?share=IQDXgJvPq9rGRI7lp7JcfjQpAY1A_hzlLl9YkPWNPx87woo"
 
+
 MILESTONES_URL = "https://uscerradao-my.sharepoint.com/:x:/g/personal/bruno_santos_cerradao_com_br/IQDG4jL7aJDyTbqReQvatnArAdNWd4rr4hVk6JvS83Nj5a4?download=1"
 
 # ==========================================

@@ -7,7 +7,7 @@ import Link from "next/link";
 import {
   LayoutDashboard,
   FileSpreadsheet,
-  BarChart3
+  BarChart3,
 } from "lucide-react";
 
 export default function CartasConvitePage() {
@@ -66,29 +66,32 @@ export default function CartasConvitePage() {
 
         </div>
 
-        {/* MENU */}
-        <nav className="relative z-10 mt-8 flex flex-col gap-1.5 px-3">
+{/* MENU */}
+<nav className="relative z-10 mt-8 flex flex-col gap-1.5 px-3">
 
-          {[
-            {
-              title: "Visão Geral",
-              icon: LayoutDashboard,
-              href: "/",
-            },
+  {[
+    {
+      title: "Visão Geral",
+      icon: LayoutDashboard,
+      href: "/",
+      active: false
+    },
 
-            {
-              title: "Cartas Convite",
-              icon: FileSpreadsheet,
-              href: "/cartas-convite",
-              active: true
-            },
+    {
+      title: "Cartas Convite",
+      icon: FileSpreadsheet,
+      href: "/cartas-convite",
+      active: true
+    },
 
-            {
-              title: "Milestones",
-              icon: BarChart3,
-              href: "/milestones"
-            }
-          ].map((item) => {
+    {
+      title: "Milestones",
+      icon: BarChart3,
+      href: "/milestones",
+      active: false
+    }
+
+  ].map((item) => {
 
     const Icon = item.icon;
 
@@ -135,6 +138,7 @@ export default function CartasConvitePage() {
       </Link>
 
     );
+
   })}
 
 </nav>
@@ -191,8 +195,7 @@ export default function CartasConvitePage() {
             </p>
 
           </div>
-
-        </div>
+    </div>
 
       </aside>
 

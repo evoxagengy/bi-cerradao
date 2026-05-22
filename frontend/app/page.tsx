@@ -88,29 +88,32 @@ export default function Home() {
           />
         </div>
 
-        {/* MENU */}
-        <nav className="relative z-10 mt-8 flex flex-col gap-1.5 px-3">
+{/* MENU */}
+<nav className="relative z-10 mt-8 flex flex-col gap-1.5 px-3">
 
-          {[
-            {
-              title: "Visão Geral",
-              icon: LayoutDashboard,
-              href: "/",
-              active: true
-            },
+  {[
+    {
+      title: "Visão Geral",
+      icon: LayoutDashboard,
+      href: "/",
+      active: true
+    },
 
-            {
-              title: "Cartas Convite",
-              icon: FileSpreadsheet,
-              href: "/cartas-convite"
-            },
+    {
+      title: "Cartas Convite",
+      icon: FileSpreadsheet,
+      href: "/cartas-convite",
+      active: false
+    },
 
-            {
-              title: "Milestones",
-              icon: BarChart3,
-              href: "/milestones"
-            }
-          ].map((item) => {
+    {
+      title: "Milestones",
+      icon: BarChart3,
+      href: "/milestones",
+      active: false
+    }
+
+  ].map((item) => {
 
     const Icon = item.icon;
 
@@ -157,66 +160,12 @@ export default function Home() {
       </Link>
 
     );
+
   })}
 
 </nav>
 
-        {/* FOOTER */}
-        <div className="relative z-10 mt-auto p-3">
-
-        {/* AUTHOR */}
-        <div className="mb-3 rounded-[18px] border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-
-          <p className="text-[10px] uppercase tracking-widest text-white/40">
-            Create by
-          </p>
-
-          <a
-            href="https://www.linkedin.com/in/bruno-raphael-450601236/"
-            target="_blank"
-            className="mt-2 flex items-center gap-2 text-[13px] font-semibold text-[#97c30a] transition hover:text-white"
-          >
-
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="h-5 w-5"
-            >
-              <path d="M19 3A2 2 0 0 1 21 5V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3H19M8.34 17V10.66H6.26V17H8.34M7.3 9.73A1.2 1.2 0 1 0 7.3 7.33A1.2 1.2 0 0 0 7.3 9.73M17.74 17V13.31C17.74 11.33 16.68 10.41 15.27 10.41C14.13 10.41 13.62 11.04 13.34 11.48V10.66H11.26C11.29 11.2 11.26 17 11.26 17H13.34V13.46C13.34 13.27 13.35 13.08 13.41 12.94C13.57 12.56 13.93 12.17 14.54 12.17C15.34 12.17 15.66 12.78 15.66 13.68V17H17.74Z"/>
-            </svg>
-
-            Bruno Raphael
-
-          </a>
-
-        </div>
-
-          <div className="rounded-[18px] border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-
-            <p className="text-[10px] uppercase tracking-widest text-white/40">
-              Sistema
-            </p>
-
-            <div className="mt-2 flex items-center gap-2">
-
-              <div className="h-2 w-2 rounded-full bg-[#97c30a]" />
-
-              <p className="text-[12px] font-semibold">
-                Online
-              </p>
-
-            </div>
-
-            <p className="mt-2 text-[11px] text-white/50">
-              Integração SharePoint
-            </p>
-
-          </div>
-
-        </div>
-
-      </aside>
+</aside>
 
       {/* CONTENT */}
       <section className="flex flex-1 flex-col overflow-hidden">
