@@ -15,7 +15,7 @@ import {
   Menu,
 } from "lucide-react";
 
-const API_URL = "https://bi-cerradao.onrender.com/milestones";
+const API_URL = "https://ppcm-milestones-api.onrender.com/milestones";
 
 export default function MilestonesPage() {
 
