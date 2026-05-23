@@ -104,7 +104,6 @@ def load_milestones():
 # ==========================================
 
 @app.get("/milestones")
-
 def milestones():
 
     df = load_milestones()
@@ -171,14 +170,21 @@ def milestones():
 
     return rows
 
+# ==========================================
+# CURVA S
+# ==========================================
+
 @app.get("/curva-s")
 def curva_s():
 
     df = load_milestones()
 
     semanas = sorted(
-        df["SEMANA"].dropna().unique()
+        df["SEMANA"].dropna().unique(),
+        key=lambda x: int(str(x))
     )
+
+    total = len(df)
 
     resultado = []
 
@@ -201,12 +207,7 @@ def curva_s():
                     semana_df["STATUS"]
                     .astype(str)
                     .str.upper()
-                    .isin([
-                        "REALIZADO",
-                        "CONCLUÍDO",
-                        "FINALIZADO",
-                        "EXECUTADO"
-                    ])
+                    == "REALIZADO"
                 )
 
                 |
@@ -225,12 +226,12 @@ def curva_s():
         acumulado_realizado += realizado
 
         percentual_planejado = round(
-            (acumulado_planejado / len(df)) * 100,
+            (acumulado_planejado / total) * 100,
             1
         )
 
         percentual_realizado = round(
-            (acumulado_realizado / len(df)) * 100,
+            (acumulado_realizado / total) * 100,
             1
         )
 
@@ -247,6 +248,10 @@ def curva_s():
         })
 
     return resultado
+
+# ==========================================
+# STATUS DEBUG
+# ==========================================
 
 @app.get("/status")
 def status():
