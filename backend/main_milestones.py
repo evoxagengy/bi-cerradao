@@ -237,3 +237,18 @@ def curva_s():
         })
 
     return resultado
+
+@app.get("/status")
+def status():
+
+    df = load_milestones()
+
+    valores = (
+        df["STATUS"]
+        .astype(str)
+        .str.upper()
+        .unique()
+        .tolist()
+    )
+
+    return valores
