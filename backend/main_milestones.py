@@ -31,7 +31,7 @@ MILESTONES_URL = "https://uscerradao-my.sharepoint.com/:x:/g/personal/bruno_sant
 
 cached_df = None
 last_update = 0
-CACHE_TIME = 300
+CACHE_TIME = 120
 
 # ==========================================
 # HELPERS
@@ -199,6 +199,11 @@ def curva_s():
 
         planejado = len(semana_df)
 
+        previsto_semana = round(
+            (planejado / total) * 100,
+            1
+        )
+
         realizado = len(
 
             semana_df[
@@ -243,7 +248,10 @@ def curva_s():
                 percentual_planejado,
 
             "realizado":
-                percentual_realizado
+                percentual_realizado,
+
+            "previsto":
+                previsto_semana
 
         })
 

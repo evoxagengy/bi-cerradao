@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import Link from "next/link";
+
 
 import {
   LayoutDashboard,
@@ -24,64 +25,109 @@ import {
   YAxis,
   Tooltip,
   ReferenceLine,
+  Legend,
 } from "recharts";
 
 const API_URL = "https://ppcm-milestones-api.onrender.com/milestones";
 
 export default function MilestonesPage() {
 
-      const [rows, setRows] = useState<any[]>([]);
-      const [curvaData, setCurvaData] = useState([]);
-  const [loading, setLoading] = useState(true);
+    const [rows, setRows] = useState<any[]>([]);
+    const [curvaData, setCurvaData] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+    const progresso = rows.length
+        ? (
+            rows.filter(
+            (r) =>
+                r.status?.toUpperCase() === "REALIZADO"
+            ).length / rows.length
+        * 100
+        ).toFixed(1)
+        : "0";
 
-    async function loadData() {
+useEffect(() => {
 
-      try {
+  async function loadData() {
 
-        const response = await fetch(API_URL);
+    try {
 
-        const data = await response.json();
+      const response = await fetch(API_URL);
 
-        if (Array.isArray(data)) {
+      const data = await response.json();
+
+      if (Array.isArray(data)) {
 
         setRows(data);
 
         const curvaResponse = await fetch(
-            "https://ppcm-milestones-api.onrender.com/curva-s"
+          "https://ppcm-milestones-api.onrender.com/curva-s"
         );
 
         const curva = await curvaResponse.json();
 
         setCurvaData(curva);
 
-        } else {
+      } else {
 
         console.error("Resposta inválida:", data);
 
         setRows([]);
 
-        }
-
-          setRows([]);
-
-        }
-
-       catch (error) {
-
-        console.error(error);
-
-      } finally {
-
-        setLoading(false);
-
       }
+
+    } catch (error) {
+
+      console.error(error);
+
+    } finally {
+
+      setLoading(false);
+
     }
 
-    loadData();
+  }
 
-  }, []);
+  loadData();
+
+}, []);
+
+const scrollRef = useRef<HTMLDivElement>(null);
+
+useEffect(() => {
+
+    const container = scrollRef.current;
+
+    if (!container) return;
+
+    let direction = 1;
+
+    const interval = setInterval(() => {
+
+        const isHovered =
+        container.matches(":hover");
+
+        if (isHovered) return;
+
+        container.scrollTop += direction;
+
+        if (
+        container.scrollTop +
+        container.clientHeight >=
+        container.scrollHeight
+        ) {
+        direction = -1;
+        }
+
+        if (container.scrollTop <= 0) {
+        direction = 1;
+        }
+
+    }, 100);
+
+    return () => clearInterval(interval);
+
+    }, []);
 
   console.log(rows);
 
@@ -101,6 +147,48 @@ const pastDays = (
 const weekNumber = Math.ceil(
   (pastDays + firstDay.getDay() + 1) / 7
 );
+
+const curvaRealizado = curvaData.map(
+  (item: any) => {
+
+    if (
+      Number(item.semana) > weekNumber
+    ) {
+      return {
+        ...item,
+        realizado: null,
+      };
+    }
+
+    return item;
+
+  }
+);
+
+const semanaAtual =
+  (curvaData as any).find(
+    (item: any) =>
+      Number(item.semana) === weekNumber
+  );
+
+const proximaSemana =
+  (curvaData as any).find(
+    (item: any) =>
+      Number(item.semana) === weekNumber + 1
+  );
+
+const planejadoAtual =
+  semanaAtual?.planejado || 0;
+
+const realizadoAtual =
+  semanaAtual?.realizado || 0;
+
+const previstoAtual =
+  proximaSemana?.planejado || 0;
+
+const diferencaAtual = (
+  planejadoAtual - realizadoAtual
+).toFixed(1);
 
   return (
 
@@ -346,94 +434,172 @@ const weekNumber = Math.ceil(
 
         </header>
 
-        {/* FILTROS */}
+{/* KPI */}
 
-        <div className="flex justify-end gap-4 mb-6">
+<div className="grid grid-cols-5 gap-4 mb-3 mt-4 justify-center">
 
-            <div className="bg-white border border-[#e3dccd] rounded-2xl px-5 py-3 shadow-[0_2px_8px_rgba(120,94,47,0.05)] min-w-[260px]">
-            <p className="text-sm text-gray-500">
-                01/01/2026 - 31/12/2026
-            </p>
-            </div>
+  <div className="rounded-[26px] border border-[#e7dcc7] bg-white px-5 py-4 shadow-[0_2px_10px_rgba(80,60,20,0.04)]">
 
-            <div className="bg-white border border-[#e3dccd] rounded-2xl px-5 py-3 shadow-[0_2px_8px_rgba(120,94,47,0.05)] min-w-[220px]">
-            <p className="text-sm text-gray-500">
-                Todos os setores
-            </p>
-            </div>
+    <div className="flex items-start justify-between">
 
-            <button className="
-            bg-[#0b5d3b]
-            hover:bg-[#08452c]
-            transition
-            text-white
-            rounded-2xl
-            px-6
-            py-3
-            shadow-[0_2px_8px_rgba(120,94,47,0.05)]
-            font-medium
-            ">
-            Atualizar dados
-            </button>
+      <div>
 
-        </div>
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#9f9587]">
+          Progresso Geral
+        </p>
 
-        {/* KPI */}
+        <h2 className="mt-3 text-[42px] font-black leading-none text-[#004d33]">
+          {progresso}%
+        </h2>
 
-        <div className="grid grid-cols-5 gap-5 mb-6">
+      </div>
 
-            <Card
-            title="PROGRESSO GERAL"
-            value="68,4%"
-            subtitle="+8,7% vs semana anterior"
-            color="lime"
-            />
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eef7d2]">
 
-            <Card
-            title="ATIVIDADES TOTAIS"
-            value={rows.length}
-            subtitle="+12 novas esta semana"
-            color="gray"
-            />
+        <TrendingUp
+          size={26}
+          className="text-[#97c30a]"
+        />
 
-            <Card
-            title="CONCLUÍDAS"
-            value={
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="rounded-[26px] border border-[#e7dcc7] bg-white px-5 py-4 shadow-[0_2px_10px_rgba(80,60,20,0.04)]">
+
+    <div className="flex items-start justify-between">
+
+      <div>
+
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#9f9587]">
+          Atividades Totais
+        </p>
+
+        <h2 className="mt-3 text-[42px] font-black leading-none text-[#111111]">
+          {rows.length}
+        </h2>
+
+      </div>
+
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f3f3f3]">
+
+        <BarChart3
+          size={26}
+          className="text-[#5d5d5d]"
+        />
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="rounded-[26px] border border-[#e7dcc7] bg-white px-5 py-4 shadow-[0_2px_10px_rgba(80,60,20,0.04)]">
+
+    <div className="flex items-start justify-between">
+
+      <div>
+
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#9f9587]">
+          Concluídas
+        </p>
+
+        <h2 className="mt-3 text-[42px] font-black leading-none text-[#004d33]">
+          {
             rows.filter(
-                (r) =>
+              (r) =>
                 r.status?.toUpperCase() === "REALIZADO"
             ).length
-            }
-            subtitle="67,7% do total"
-            color="green"
-            />
+          }
+        </h2>
 
-            <Card
-            title="EM ANDAMENTO"
-            value={
+      </div>
+
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#dcf4e4]">
+
+        <CheckCircle2
+          size={26}
+          className="text-[#0b8f45]"
+        />
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="rounded-[26px] border border-[#e7dcc7] bg-white px-5 py-4 shadow-[0_2px_10px_rgba(80,60,20,0.04)]">
+
+    <div className="flex items-start justify-between">
+
+      <div>
+
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#9f9587]">
+          Agendado
+        </p>
+
+        <h2 className="mt-3 text-[42px] font-black leading-none text-[#7a4b00]">
+          {
             rows.filter((r) =>
-                ["AGENDADO", "EM ANDAMENTO", "EM EXECUÇÃO"].includes(
+              ["AGENDADO", "EM ANDAMENTO", "EM EXECUÇÃO"].includes(
                 r.status?.toUpperCase()
-                )
+              )
             ).length
-            }
-            subtitle="25,8% do total"
-            color="orange"
-            />
+          }
+        </h2>
 
-            <Card
-            title="EM ATRASO"
-            value={
+      </div>
+
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f7e8d0]">
+
+        <Clock3
+          size={26}
+          className="text-[#d97706]"
+        />
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="rounded-[26px] border border-[#e7dcc7] bg-white px-5 py-4 shadow-[0_2px_10px_rgba(80,60,20,0.04)]">
+
+    <div className="flex items-start justify-between">
+
+      <div>
+
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#9f9587]">
+          Em Atraso
+        </p>
+
+        <h2 className="mt-3 text-[42px] font-black leading-none text-[#9f1111]">
+          {
             rows.filter(
-                (r) =>
+              (r) =>
                 r.status?.toUpperCase() === "ATRASADO"
             ).length
-            }
-            subtitle="6,5% do total"
-            color="red"
-            />
+          }
+        </h2>
 
-        </div>
+      </div>
+
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f8dede]">
+
+        <AlertTriangle
+          size={26}
+          className="text-[#d61f1f]"
+        />
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
 
         {/* GRID SUPERIOR */}
 
@@ -465,7 +631,7 @@ const weekNumber = Math.ceil(
 
             <ResponsiveContainer width="100%" height={360}>
 
-        <LineChart data={curvaData}>
+        <LineChart data={curvaRealizado}>
 
         <CartesianGrid
             strokeDasharray="3 3"
@@ -503,138 +669,276 @@ const weekNumber = Math.ceil(
         />
 
         <ReferenceLine
-            x={String(weekNumber)}
-            stroke="#ff6d00"
-            strokeDasharray="6 6"
-            label={{
+        x={String(weekNumber)}
+        stroke="#ff6d00"
+        strokeDasharray="6 6"
+        label={{
             value: "Semana Atual",
             position: "top",
             fill: "#ff6d00",
             fontSize: 11,
-            }}
+        }}
         />
 
         <Line
-            type="natural"
-            dataKey="planejado"
-            stroke="#97c30a"
-            strokeWidth={4}
-            dot={false}
-            activeDot={{ r: 6 }}
+        name="Planejado"
+        type="natural"
+        dataKey="planejado"
+        stroke="#97c30a"
+        strokeWidth={4}
+        dot={false}
+        activeDot={{ r: 6 }}
+
+        label={(props: any) => {
+
+            const { x, y, index } = props;
+
+            const item =
+            (curvaData as any)[index];
+
+            if (!item) return null;
+
+            const semana =
+            Number(item.semana);
+
+            if (
+            semana !== weekNumber &&
+            semana !== weekNumber + 1
+            ) {
+            return null;
+            }
+
+            return (
+
+            <text
+                x={x}
+                y={Number(y) - 10}
+                fill="#ff6d00"
+                fontSize={13}
+                fontWeight="bold"
+                textAnchor="middle"
+            >
+                {item.planejado}%
+            </text>
+
+            );
+
+        }}
         />
 
         <Line
-            type="natural"
-            dataKey="realizado"
-            stroke="#004d33"
-            strokeWidth={4}
-            dot={false}
-            activeDot={{ r: 6 }}
+        name="Realizado"
+        type="natural"
+        dataKey="realizado"
+        stroke="#004d33"
+        strokeWidth={4}
+        dot={false}
+        activeDot={{ r: 6 }}
+
+        label={(props: any) => {
+
+            const { x, y, index } = props;
+
+            const item =
+            (curvaData as any)[index];
+
+            if (!item) return null;
+
+            const semana =
+            Number(item.semana);
+
+            if (semana !== weekNumber) {
+            return null;
+            }
+
+            return (
+
+            <text
+                x={x}
+                y={Number(y) - 30}
+                fill="#004d33"
+                fontSize={14}
+                fontWeight="bold"
+                textAnchor="middle"
+            >
+                {item.realizado}%
+            </text>
+
+            );
+
+        }}
         />
 
         </LineChart>
 
             </ResponsiveContainer>
 
-            {/* FOOTER */}
+        {/* FOOTER */}
 
-            <div className="grid grid-cols-4 gap-4 mt-6">
+        <div className="grid grid-cols-4 gap-4 mt-6">
 
-                {[
-                ["PLANEJADO", "68,4%"],
-                ["REALIZADO", "68,4%"],
-                ["PREVISTO", "100%"],
-                ["DIFERENÇA", "0,0%"],
-                ].map((item) => (
+        {[
+            [
+            "PLANEJADO",
+            `${planejadoAtual}%`
+            ],
+
+            [
+            "REALIZADO",
+            `${realizadoAtual}%`
+            ],
+
+            [
+            "PREVISTO",
+            `${previstoAtual}%`
+            ],
+
+            [
+            "DIFERENÇA",
+            `${diferencaAtual}%`
+            ],
+
+        ].map((item) => (
+
+            <div
+            key={item[0]}
+            className="bg-[#fafafa] border border-[#e3dccd] rounded-2xl p-4"
+            >
+
+            <p className="text-xs text-gray-400">
+                {item[0]}
+            </p>
+
+            <h3 className="text-3xl font-bold text-[#0b5d3b] mt-2">
+                {item[1]}
+            </h3>
+
+            </div>
+
+        ))}
+
+        </div>
+
+            </div>
+
+        {/* PRÓXIMAS ATIVIDADES */}
+
+        <div className="bg-white rounded-3xl border border-[#e3dccd] p-5 shadow-[0_2px_8px_rgba(120,94,47,0.05)]">
+
+        <div className="flex items-center justify-between mb-6">
+
+            <div>
+
+            <h2 className="text-[32px] font-semibold text-[#1d1d1d]">
+                Próximas Atividades
+            </h2>
+
+            <p className="text-sm text-gray-500 mt-1">
+                Atividades críticas da semana atual
+            </p>
+
+            </div>
+
+            <div className="h-10 w-10 rounded-2xl bg-[#004d33] flex items-center justify-center text-white text-sm font-bold">
+            !
+            </div>
+
+        </div>
+
+        <div
+        ref={scrollRef}
+        className="space-y-4 max-h-[420px] overflow-y-auto pr-2"
+        >
+
+            {(rows as any)
+
+            .filter((item: any) => {
+
+                const semana =
+                Number(item.semana);
+
+                return (
+
+                item.status?.toUpperCase() === "ATRASADO"
+
+                ||
+
+                semana === weekNumber
+
+                ||
+
+                semana === weekNumber + 1
+
+                );
+
+            })
+
+            .slice(0, 6)
+
+            .map((item: any, index: number) => (
 
                 <div
-                    key={item[0]}
-                    className="bg-[#fafafa] border border-[#e3dccd] rounded-2xl p-4"
+                key={index}
+                className={`rounded-2xl p-4 border transition-all ${
+                item.status?.toUpperCase() === "ATRASADO"
+                    ? "border-[#ffb4b4] bg-[#fff5f5] shadow-[0_0_0_1px_rgba(255,0,0,0.04)]"
+                    : "border-[#ece4d3] bg-[#faf8f3]"
+                }`}
                 >
 
-                    <p className="text-xs text-gray-400">
-                    {item[0]}
-                    </p>
+                <div className="flex items-start justify-between gap-4">
 
-                    <h3 className="text-3xl font-bold text-[#0b5d3b] mt-2">
-                    {item[1]}
+                    <div>
+                <p
+                className={`inline-flex rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide ${
+                    item.status?.toUpperCase() === "ATRASADO"
+                    ? "bg-[#ffdfdf] text-[#c10000]"
+                    : "bg-[#e7f7ea] text-[#0b7a33]"
+                }`}
+                >
+                {item.status}
+                </p>
+
+                    <h3 className="mt-1 text-[15px] font-semibold text-[#1d1d1d] leading-snug">
+                        {item.topico}
                     </h3>
 
-                </div>
-
-                ))}
-
-            </div>
-
-            </div>
-
-            {/* RESPONSÁVEIS */}
-
-            <div className="bg-white rounded-3xl border border-[#e3dccd] p-5 shadow-[0_2px_8px_rgba(120,94,47,0.05)] h-[470px]">
-
-            <div className="flex justify-between items-center mb-6">
-
-                <h2 className="text-xl font-semibold text-[#1d1d1d]">
-                Entrega por Responsável
-                </h2>
-
-                <div className="bg-[#0b5d3b] text-white rounded-xl px-3 py-2 text-sm">
-                %
-                </div>
-
-            </div>
-
-            <div className="space-y-8">
-
-                {[
-                ["Jhonatan", "42,6%", "w-[85%]"],
-                ["Edvaldo", "25,8%", "w-[65%]"],
-                ["Luã", "15,3%", "w-[45%]"],
-                ["Leandro", "8,7%", "w-[25%]"],
-                ["Outros", "7,6%", "w-[20%]"],
-                ].map((item, index) => (
-
-                <div key={index}>
-
-                    <div className="flex justify-between text-sm mb-2">
-
-                    <span className="font-medium">
-                        {item[0]}
-                    </span>
-
-                    <span className="font-semibold">
-                        {item[1]}
-                    </span>
+                    <p className="mt-2 text-[13px] text-[#6f6557]">
+                        {item.detalhamento}
+                    </p>
 
                     </div>
 
-                    <div className="w-full h-4 bg-[#f1f1f1] rounded-full overflow-hidden">
+                    <div className="min-w-[90px] text-right">
 
-                    <div
-                        className={`h-full rounded-full ${item[2]}`}
-                        style={{
-                        background:
-                            index === 0
-                            ? "#0b5d3b"
-                            : index === 1
-                            ? "#1f7a4d"
-                            : index === 2
-                            ? "#97c30a"
-                            : index === 3
-                            ? "#ff6b00"
-                            : "#652e17"
-                        }}
-                    />
+                    <p className="text-[11px] text-gray-400">
+                        Responsável
+                    </p>
+
+                    <p className="mt-1 text-[13px] font-bold text-[#004d33]">
+                        {item.responsavel}
+                    </p>
+
+                    <p className="mt-3 text-[11px] text-gray-400">
+                        Semana
+                    </p>
+
+                    <p className="mt-1 text-[13px] font-bold text-[#a3652a]">
+                        {item.semana}
+                    </p>
 
                     </div>
 
                 </div>
 
-                ))}
+                </div>
 
-            </div>
+            ))}
 
-            </div>
+        </div>
+
+        </div>
+
 
         </div>
 
@@ -654,7 +958,7 @@ function Card({
 
   return (
 
-    <div className="bg-white rounded-3xl border border-[#e3dccd] p-5 shadow-[0_2px_8px_rgba(120,94,47,0.05)]">
+    <div className="bg-white rounded-3xl border border-[#e3dccd] p-5 shadow-[0_2px_8px_rgba(120,94,47,0.05)] overflow-hidden">
 
       <div className="flex justify-between items-start">
 
