@@ -194,20 +194,31 @@ def curva_s():
         planejado = len(semana_df)
 
         realizado = len(
+
             semana_df[
+
                 (
                     semana_df["STATUS"]
                     .astype(str)
                     .str.upper()
-                    == "REALIZADO"
+                    .isin([
+                        "REALIZADO",
+                        "CONCLUÍDO",
+                        "FINALIZADO",
+                        "EXECUTADO"
+                    ])
                 )
+
                 |
+
                 (
                     semana_df["AVANÇO"]
                     .astype(str)
                     .str.contains("100")
                 )
+
             ]
+
         )
 
         acumulado_planejado += planejado
