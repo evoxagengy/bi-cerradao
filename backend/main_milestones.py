@@ -71,7 +71,7 @@ def load_milestones():
     df = pd.read_excel(
         excel_file,
         sheet_name="BASE_CURVA",
-        engine="openpyxl",
+        engine="calamine",
         usecols=[
             "ASSUNTO",
             "TÓPICO",
@@ -91,7 +91,7 @@ def load_milestones():
 
     df.columns = df.columns.str.strip()
 
-    df = df.fillna("").astype(str)
+    df = df.fillna("")
 
     cached_df = df
 
