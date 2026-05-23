@@ -105,62 +105,6 @@ def load_milestones():
 
 @app.get("/milestones")
 
-@app.get("/curva-s")
-def curva_s():
-
-    df = load_milestones()
-
-    semanas = sorted(
-        df["SEMANA"].dropna().unique()
-    )
-
-    resultado = []
-
-    acumulado_planejado = 0
-    acumulado_realizado = 0
-
-    for semana in semanas:
-
-        semana_df = df[
-            df["SEMANA"] == semana
-        ]
-
-        planejado = len(semana_df)
-
-        realizado = len(
-            semana_df[
-                (
-                    semana_df["STATUS"]
-                    .astype(str)
-                    .str.upper()
-                    == "REALIZADO"
-                )
-                |
-                (
-                    semana_df["AVANÇO"]
-                    .astype(str)
-                    .str.contains("100")
-                )
-            ]
-        )
-
-        acumulado_planejado += planejado
-        acumulado_realizado += realizado
-
-        resultado.append({
-
-            "semana": str(semana),
-
-            "planejado":
-                acumulado_planejado,
-
-            "realizado":
-                acumulado_realizado
-
-        })
-
-    return resultado
-
 def milestones():
 
     df = load_milestones()
@@ -226,3 +170,59 @@ def milestones():
         })
 
     return rows
+
+@app.get("/curva-s")
+def curva_s():
+
+    df = load_milestones()
+
+    semanas = sorted(
+        df["SEMANA"].dropna().unique()
+    )
+
+    resultado = []
+
+    acumulado_planejado = 0
+    acumulado_realizado = 0
+
+    for semana in semanas:
+
+        semana_df = df[
+            df["SEMANA"] == semana
+        ]
+
+        planejado = len(semana_df)
+
+        realizado = len(
+            semana_df[
+                (
+                    semana_df["STATUS"]
+                    .astype(str)
+                    .str.upper()
+                    == "REALIZADO"
+                )
+                |
+                (
+                    semana_df["AVANÇO"]
+                    .astype(str)
+                    .str.contains("100")
+                )
+            ]
+        )
+
+        acumulado_planejado += planejado
+        acumulado_realizado += realizado
+
+        resultado.append({
+
+            "semana": str(semana),
+
+            "planejado":
+                acumulado_planejado,
+
+            "realizado":
+                acumulado_realizado
+
+        })
+
+    return resultado
