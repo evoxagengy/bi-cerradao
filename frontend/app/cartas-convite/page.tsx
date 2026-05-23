@@ -200,20 +200,98 @@ export default function CartasConvitePage() {
       </aside>
 
       {/* CONTENT */}
-      <section className="flex-1 overflow-auto p-6">
+      <section className="flex flex-1 flex-col overflow-hidden">
 
         {/* HEADER */}
-        <div className="mb-6">
+        <header className="relative overflow-hidden border-b border-[#eadfca] bg-[#f4efe6] px-4 py-2">
 
-          <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#a3652a]">
-            Gestão Operacional
-          </p>
+          <div className="absolute right-0 top-0 h-full w-[400px] opacity-70">
 
-          <h1 className="mt-1 text-[34px] font-black text-[#004d33]">
-            Cartas Convite
-          </h1>
+          <img
+          src="/fundo.png"
+          className="
+              h-full
+              w-full
+              object-cover
+              opacity-70
+              scale-105
+              contrast-125
+              brightness-95
+          "
+          />
 
-        </div>
+          </div>
+
+          <div className="relative z-10 flex items-center justify-between">
+
+            <div>
+
+              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#a3652a]">
+                VISÃO OPERACIONAL
+              </p>
+
+              <h1 className="mt-1 text-[30px] font-black leading-none tracking-tight text-[#004d33]">
+                Cartas Convites
+              </h1>
+
+              <p className="mt-1 text-[11px] text-[#6f6557]">
+                Gestão e acompanhamento detalhado das cartas - ES 26/27
+              </p>
+
+            </div>
+
+              <div className="flex items-center gap-3">
+
+                {/* AMBIENTE */}
+                <div className="rounded-2xl border border-[#e3d7c0] bg-white px-3 py-2 shadow-sm">
+
+                  <p className="text-[9px] uppercase tracking-wide text-[#8f8578]">
+                    Ambiente
+                  </p>
+
+                  <div className="mt-1 flex items-center gap-2">
+
+                    <div className="h-2 w-2 rounded-full bg-[#0a8f08]" />
+
+                    <span className="text-[11px] font-bold text-[#004d33]">
+                      Online
+                    </span>
+
+                  </div>
+
+                </div>
+
+                {/* UPDATE */}
+                <div className="rounded-2xl border border-[#e3d7c0] bg-white px-3 py-2 shadow-sm">
+
+                  <p className="text-[9px] uppercase tracking-wide text-[#8f8578]">
+                    Atualização
+                  </p>
+
+                  <p className="mt-1 text-[11px] font-bold text-[#004d33]">
+                    Tempo Real
+                  </p>
+
+                </div>
+
+                {/* DATA */}
+                <div className="rounded-2xl border border-[#e3d7c0] bg-white px-4 py-2 shadow-sm">
+
+                  <p className="text-[9px] uppercase tracking-wide text-[#8f8578]">
+                    Data/Hora
+                  </p>
+
+                  <p className="mt-1 text-[11px] font-bold text-[#004d33]">
+                    {new Date().toLocaleString("pt-BR")}
+                  </p>
+
+                </div>
+
+              </div>
+
+          </div>
+
+        </header>
 
         {/* TABLE */}
         <div className="overflow-x-auto overflow-y-auto rounded-[22px] border border-[#eadfca] bg-white shadow-sm">

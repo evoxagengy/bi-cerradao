@@ -14,6 +14,7 @@ import {
   Clock3,
   AlertTriangle,
   Menu,
+  ClipboardList,
 } from "lucide-react";
 
 import {
@@ -183,8 +184,13 @@ const planejadoAtual =
 const realizadoAtual =
   semanaAtual?.realizado || 0;
 
-const previstoAtual =
-  proximaSemana?.planejado || 0;
+  const aderenciaAtual =
+  planejadoAtual > 0
+    ? (
+        (realizadoAtual / planejadoAtual)
+        * 100
+      ).toFixed(1)
+    : "0";
 
 const diferencaAtual = (
   planejadoAtual - realizadoAtual
@@ -354,12 +360,20 @@ const diferencaAtual = (
         {/* HEADER */}
         <header className="relative overflow-hidden border-b border-[#eadfca] bg-[#f4efe6] px-4 py-2">
 
-          <div className="absolute right-0 top-0 h-full w-[400px] opacity-10">
+          <div className="absolute right-0 top-0 h-full w-[400px] opacity-70">
 
-            <img
-              src="/fundo.png"
-              className="h-full w-full object-cover"
-            />
+        <img
+        src="/fundo.png"
+        className="
+            h-full
+            w-full
+            object-cover
+            opacity-70
+            scale-105
+            contrast-125
+            brightness-95
+        "
+        />
 
           </div>
 
@@ -603,7 +617,7 @@ const diferencaAtual = (
 
         {/* GRID SUPERIOR */}
 
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid grid-cols-3 gap-2">
 
             {/* CURVA S */}
 
@@ -614,7 +628,7 @@ const diferencaAtual = (
                 <div>
 
                 <h2 className="text-xl font-semibold text-[#1d1d1d]">
-                    Curva S - Progresso Acumulado
+                    MILESTONES | Curva S - Progresso Acumulado
                 </h2>
 
                 <p className="text-sm text-sm text-gray-500 mt-1">
@@ -622,10 +636,6 @@ const diferencaAtual = (
                 </p>
 
                 </div>
-
-                <button className="border border-[#e3dccd] rounded-xl px-4 py-2 text-sm">
-                Semanal
-                </button>
 
             </div>
 
@@ -635,7 +645,7 @@ const diferencaAtual = (
 
         <CartesianGrid
             strokeDasharray="3 3"
-            stroke="#ece7dc"
+            stroke="#d1cdc5"
         />
 
         <XAxis
@@ -649,14 +659,13 @@ const diferencaAtual = (
         />
 
         <YAxis
-            tickLine={false}
-            axisLine={false}
-            domain={[0, 100]}
-            tickFormatter={(value) => `${value}%`}
-            tick={{
+        domain={[0, 110]}
+        tickLine={false}
+        axisLine={false}
+        tick={{
             fontSize: 11,
             fill: "#6f6557"
-            }}
+        }}
         />
 
         <Tooltip
@@ -691,37 +700,78 @@ const diferencaAtual = (
 
         label={(props: any) => {
 
-            const { x, y, index } = props;
+        const { x, y, index } = props;
 
-            const item =
+        const item =
             (curvaData as any)[index];
 
-            if (!item) return null;
+        if (!item) return null;
 
-            const semana =
+        const semana =
             Number(item.semana);
 
-            if (
-            semana !== weekNumber &&
-            semana !== weekNumber + 1
-            ) {
-            return null;
-            }
+        const percentual =
+            Number(item.planejado);
 
-            return (
+        const isUltimaSemana =
+            index === curvaData.length - 1;
+
+        const mostrarEscala =
+
+        percentual === 21.2 ||
+
+        percentual === 51.3 ||
+
+        percentual === 36.5 ||
+
+        percentual === 77.2 ||
+
+        percentual === 93 ||
+
+        percentual === 100;
+
+        const mostrarSemanaAtual =
+            semana === weekNumber;
+
+        const mostrarProximaSemana =
+            semana === weekNumber + 1;
+
+        if (
+
+            !mostrarEscala &&
+
+            !mostrarSemanaAtual &&
+
+            !mostrarProximaSemana &&
+
+            !isUltimaSemana
+
+        ) {
+            return null;
+        }
+
+        return (
 
             <text
-                x={x}
-                y={Number(y) - 10}
-                fill="#ff6d00"
-                fontSize={13}
-                fontWeight="bold"
-                textAnchor="middle"
+            x={
+            percentual === 100
+                ? Number(x) - 8
+                : x
+            }
+            y={Number(y) - 8}
+            fill="#97bd10"
+            fontSize={12}
+            fontWeight="bold"
+            textAnchor={
+            percentual === 100
+                ? "end"
+                : "middle"
+            }
             >
-                {item.planejado}%
+            {item.planejado}%
             </text>
 
-            );
+        );
 
         }}
         />
@@ -773,57 +823,144 @@ const diferencaAtual = (
 
             </ResponsiveContainer>
 
-        {/* FOOTER */}
+<p className="text-center text-[12px] font-semibold uppercase tracking-[0.2em] text-[#9f9587] mb-2 mt-2">
+  Semanas
+</p>
 
-        <div className="grid grid-cols-4 gap-4 mt-6">
+<div className="flex items-center justify-center gap-12 mt-2">
 
-        {[
-            [
-            "PLANEJADO",
-            `${planejadoAtual}%`
-            ],
+  <div className="flex items-center gap-3">
 
-            [
-            "REALIZADO",
-            `${realizadoAtual}%`
-            ],
+    <div className="h-[4px] w-10 rounded-full bg-[#97c30a]" />
 
-            [
-            "PREVISTO",
-            `${previstoAtual}%`
-            ],
+    <p className="text-[13px] font-semibold text-[#6f6557] uppercase tracking-[0.08em]">
+      Planejado
+    </p>
 
-            [
-            "DIFERENÇA",
-            `${diferencaAtual}%`
-            ],
+  </div>
 
-        ].map((item) => (
+  <div className="flex items-center gap-3">
 
-            <div
-            key={item[0]}
-            className="bg-[#fafafa] border border-[#e3dccd] rounded-2xl p-4"
-            >
+    <div className="h-[4px] w-10 rounded-full bg-[#004d33]" />
 
-            <p className="text-xs text-gray-400">
-                {item[0]}
-            </p>
+    <p className="text-[13px] font-semibold text-[#6f6557] uppercase tracking-[0.08em]">
+      Realizado
+    </p>
 
-            <h3 className="text-3xl font-bold text-[#0b5d3b] mt-2">
-                {item[1]}
-            </h3>
+  </div>
 
-            </div>
+</div>
 
-        ))}
+{/* FOOTER */}
 
-        </div>
+<div className="grid grid-cols-4 gap-4 mt-2">
 
-            </div>
+  <div className="rounded-[28px] border border-[#dfe8c7] bg-gradient-to-br from-[#fbfff2] to-[#f3f8df] px-6 py-5 shadow-[0_2px_12px_rgba(151,195,10,0.06)]">
+
+    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#9cad71]">
+      Planejado
+    </p>
+
+    <div className="flex items-end justify-between mt-4">
+
+      <h3 className="text-[42px] font-black leading-none text-[#6fa300]">
+        {planejadoAtual}%
+      </h3>
+
+      <div className="h-12 w-12 rounded-2xl bg-[#e7f2ba] flex items-center justify-center">
+
+        <ClipboardList
+        size={22}
+        className="text-[#8dbc00]"
+        />
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="rounded-[28px] border border-[#cfe7dc] bg-gradient-to-br from-[#f7fffb] to-[#e7f8f0] px-6 py-5 shadow-[0_2px_12px_rgba(0,77,51,0.05)]">
+
+    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#77a392]">
+      Realizado
+    </p>
+
+    <div className="flex items-end justify-between mt-4">
+
+      <h3 className="text-[42px] font-black leading-none text-[#004d33]">
+        {realizadoAtual}%
+      </h3>
+
+      <div className="h-12 w-12 rounded-2xl bg-[#d7f0e5] flex items-center justify-center">
+
+        <CheckCircle2
+          size={22}
+          className="text-[#00754d]"
+        />
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="rounded-[28px] border border-[#d9e3f7] bg-gradient-to-br from-[#fbfdff] to-[#edf4ff] px-6 py-5 shadow-[0_2px_12px_rgba(0,80,180,0.04)]">
+
+    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#7890b8]">
+      Aderência
+    </p>
+
+    <div className="flex items-end justify-between mt-4">
+
+      <h3 className="text-[42px] font-black leading-none text-[#2457a7]">
+        {aderenciaAtual}%
+      </h3>
+
+      <div className="h-12 w-12 rounded-2xl bg-[#dce9ff] flex items-center justify-center">
+
+        <BarChart3
+          size={22}
+          className="text-[#2d63ba]"
+        />
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="rounded-[28px] border border-[#f0ddcf] bg-gradient-to-br from-[#fffaf7] to-[#fff1e7] px-6 py-5 shadow-[0_2px_12px_rgba(255,120,0,0.05)]">
+
+    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#bf8d63]">
+      Diferença
+    </p>
+
+    <div className="flex items-end justify-between mt-4">
+
+      <h3 className="text-[42px] font-black leading-none text-[#d16c00]">
+        {diferencaAtual}%
+      </h3>
+
+      <div className="h-12 w-12 rounded-2xl bg-[#ffe5d1] flex items-center justify-center">
+
+        <AlertTriangle
+          size={22}
+          className="text-[#e97b00]"
+        />
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+</div>
 
         {/* PRÓXIMAS ATIVIDADES */}
 
-        <div className="bg-white rounded-3xl border border-[#e3dccd] p-5 shadow-[0_2px_8px_rgba(120,94,47,0.05)]">
+        <div className="bg-white rounded-3xl border border-[#e3dccd] p-5 shadow-[0_2px_8px_rgba(120,94,47,0.05)] h-[660]">
 
         <div className="flex items-center justify-between mb-6">
 
@@ -852,88 +989,118 @@ const diferencaAtual = (
 
             {(rows as any)
 
-            .filter((item: any) => {
+  .filter((item: any) => {
 
-                const semana =
-                Number(item.semana);
+    const semana =
+      Number(item.semana);
 
-                return (
+    return (
 
-                item.status?.toUpperCase() === "ATRASADO"
+      item.status?.toUpperCase() === "ATRASADO"
 
-                ||
+      ||
 
-                semana === weekNumber
+      semana === weekNumber
 
-                ||
+      ||
 
-                semana === weekNumber + 1
+      semana === weekNumber + 1
 
-                );
+    );
 
-            })
+  })
 
-            .slice(0, 6)
+  .sort((a: any, b: any) => {
 
-            .map((item: any, index: number) => (
+    const statusA =
+      a.status?.toUpperCase();
 
-                <div
-                key={index}
-                className={`rounded-2xl p-4 border transition-all ${
-                item.status?.toUpperCase() === "ATRASADO"
-                    ? "border-[#ffb4b4] bg-[#fff5f5] shadow-[0_0_0_1px_rgba(255,0,0,0.04)]"
-                    : "border-[#ece4d3] bg-[#faf8f3]"
-                }`}
-                >
+    const statusB =
+      b.status?.toUpperCase();
 
-                <div className="flex items-start justify-between gap-4">
+    if (
+      statusA === "ATRASADO" &&
+      statusB !== "ATRASADO"
+    ) {
+      return -1;
+    }
 
-                    <div>
-                <p
-                className={`inline-flex rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide ${
-                    item.status?.toUpperCase() === "ATRASADO"
-                    ? "bg-[#ffdfdf] text-[#c10000]"
-                    : "bg-[#e7f7ea] text-[#0b7a33]"
-                }`}
-                >
-                {item.status}
-                </p>
+    if (
+      statusA !== "ATRASADO" &&
+      statusB === "ATRASADO"
+    ) {
+      return 1;
+    }
 
-                    <h3 className="mt-1 text-[15px] font-semibold text-[#1d1d1d] leading-snug">
-                        {item.topico}
-                    </h3>
+    return (
+      Number(a.semana) -
+      Number(b.semana)
+    );
 
-                    <p className="mt-2 text-[13px] text-[#6f6557]">
-                        {item.detalhamento}
-                    </p>
+  })
 
-                    </div>
+  .slice(0, 6)
 
-                    <div className="min-w-[90px] text-right">
+  .map((item: any, index: number) => (
 
-                    <p className="text-[11px] text-gray-400">
-                        Responsável
-                    </p>
+    <div
+      key={index}
+      className={`rounded-2xl p-4 border transition-all ${
+        item.status?.toUpperCase() === "ATRASADO"
+          ? "border-[#ffb4b4] bg-[#fff5f5] shadow-[0_0_0_1px_rgba(255,0,0,0.04)]"
+          : "border-[#ece4d3] bg-[#faf8f3]"
+      }`}
+    >
 
-                    <p className="mt-1 text-[13px] font-bold text-[#004d33]">
-                        {item.responsavel}
-                    </p>
+      <div className="flex items-start justify-between gap-4">
 
-                    <p className="mt-3 text-[11px] text-gray-400">
-                        Semana
-                    </p>
+        <div>
 
-                    <p className="mt-1 text-[13px] font-bold text-[#a3652a]">
-                        {item.semana}
-                    </p>
+          <p
+            className={`inline-flex rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide ${
+              item.status?.toUpperCase() === "ATRASADO"
+                ? "bg-[#ffdfdf] text-[#c10000]"
+                : "bg-[#e7f7ea] text-[#0b7a33]"
+            }`}
+          >
+            {item.status}
+          </p>
 
-                    </div>
+          <h3 className="mt-1 text-[15px] font-semibold text-[#1d1d1d] leading-snug">
+            {item.topico}
+          </h3>
 
-                </div>
+          <p className="mt-2 text-[13px] text-[#6f6557]">
+            {item.detalhamento}
+          </p>
 
-                </div>
+        </div>
 
-            ))}
+        <div className="min-w-[90px] text-right">
+
+          <p className="text-[11px] text-gray-400">
+            Responsável
+          </p>
+
+          <p className="mt-1 text-[13px] font-bold text-[#004d33]">
+            {item.responsavel}
+          </p>
+
+          <p className="mt-3 text-[11px] text-gray-400">
+            Semana
+          </p>
+
+          <p className="mt-1 text-[13px] font-bold text-[#a3652a]">
+            {item.semana}
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+))}
 
         </div>
 
