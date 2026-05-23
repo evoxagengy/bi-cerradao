@@ -15,11 +15,23 @@ import {
   Menu,
 } from "lucide-react";
 
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ReferenceLine,
+} from "recharts";
+
 const API_URL = "https://ppcm-milestones-api.onrender.com/milestones";
 
 export default function MilestonesPage() {
 
       const [rows, setRows] = useState<any[]>([]);
+      const [curvaData, setCurvaData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,17 +46,29 @@ export default function MilestonesPage() {
 
         if (Array.isArray(data)) {
 
-          setRows(data);
+        setRows(data);
+
+        const curvaResponse = await fetch(
+            "https://ppcm-milestones-api.onrender.com/curva-s"
+        );
+
+        const curva = await curvaResponse.json();
+
+        setCurvaData(curva);
 
         } else {
 
-          console.error("Resposta inválida:", data);
+        console.error("Resposta inválida:", data);
+
+        setRows([]);
+
+        }
 
           setRows([]);
 
         }
 
-      } catch (error) {
+       catch (error) {
 
         console.error(error);
 
@@ -60,6 +84,23 @@ export default function MilestonesPage() {
   }, []);
 
   console.log(rows);
+
+  const currentWeek = new Date();
+
+const firstDay = new Date(
+  currentWeek.getFullYear(),
+  0,
+  1
+);
+
+const pastDays = (
+  currentWeek.getTime() -
+  firstDay.getTime()
+) / 86400000;
+
+const weekNumber = Math.ceil(
+  (pastDays + firstDay.getDay() + 1) / 7
+);
 
   return (
 
@@ -422,20 +463,78 @@ export default function MilestonesPage() {
 
             </div>
 
-            <div className="
-                w-full
-                h-[360px]
-                rounded-2xl
-                border
-                border-dashed
-                border-[#dcdcdc]
-                flex
-                items-center
-                justify-center
-                text-gray-400
-            ">
-                CURVA S CHART
-            </div>
+            <ResponsiveContainer width="100%" height={360}>
+
+        <LineChart data={curvaData}>
+
+        <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="#ece7dc"
+        />
+
+        <XAxis
+            dataKey="semana"
+            tickLine={false}
+            axisLine={false}
+            tick={{
+            fontSize: 11,
+            fill: "#6f6557"
+            }}
+        />
+
+        <YAxis
+            tickLine={false}
+            axisLine={false}
+            domain={[0, 100]}
+            tickFormatter={(value) => `${value}%`}
+            tick={{
+            fontSize: 11,
+            fill: "#6f6557"
+            }}
+        />
+
+        <Tooltip
+            formatter={(value: any) => [`${value}%`]}
+            contentStyle={{
+            borderRadius: "14px",
+            border: "1px solid #eadfca",
+            fontSize: "12px",
+            }}
+        />
+
+        <ReferenceLine
+            x={String(weekNumber)}
+            stroke="#ff6d00"
+            strokeDasharray="6 6"
+            label={{
+            value: "Semana Atual",
+            position: "top",
+            fill: "#ff6d00",
+            fontSize: 11,
+            }}
+        />
+
+        <Line
+            type="natural"
+            dataKey="planejado"
+            stroke="#97c30a"
+            strokeWidth={4}
+            dot={false}
+            activeDot={{ r: 6 }}
+        />
+
+        <Line
+            type="natural"
+            dataKey="realizado"
+            stroke="#004d33"
+            strokeWidth={4}
+            dot={false}
+            activeDot={{ r: 6 }}
+        />
+
+        </LineChart>
+
+            </ResponsiveContainer>
 
             {/* FOOTER */}
 

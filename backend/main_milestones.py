@@ -224,15 +224,25 @@ def curva_s():
         acumulado_planejado += planejado
         acumulado_realizado += realizado
 
+        percentual_planejado = round(
+            (acumulado_planejado / len(df)) * 100,
+            1
+        )
+
+        percentual_realizado = round(
+            (acumulado_realizado / len(df)) * 100,
+            1
+        )
+
         resultado.append({
 
             "semana": str(semana),
 
             "planejado":
-                acumulado_planejado,
+                percentual_planejado,
 
             "realizado":
-                acumulado_realizado
+                percentual_realizado
 
         })
 
