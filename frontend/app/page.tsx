@@ -24,7 +24,14 @@ export default function Home() {
 
   const [dashboard, setDashboard] = useState<any>(null);
 
+  const [currentDate, setCurrentDate] =
+  useState("");
+
   useEffect(() => {
+
+      setCurrentDate(
+    new Date().toLocaleString("pt-BR")
+  );
 
   const fetchDashboard = () => {
   
@@ -304,7 +311,7 @@ export default function Home() {
                   </p>
 
                   <p className="mt-1 text-[11px] font-bold text-[#004d33]">
-                    {new Date().toLocaleString("pt-BR")}
+                    {currentDate}
                   </p>
 
                 </div>
